@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+    width="800"
+    height="800"
+    viewBox="0 0 800 800"
+    version="1.1"
+    id="svg1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:svg="http://www.w3.org/2000/svg">
+   <defs
+       id="defs1" />
+   <g
+       id="layer1">
+      <rect
+          style="fill:#000000;fill-opacity:0;stroke:#7dffff;stroke-width:10;stroke-dasharray:none;stroke-opacity:1"
+          id="rect2"
+          width="300"
+          height="100"
+          x="250"
+          y="500"
+          ry="20"
+          rx="20" />
+      <text
+          xml:space="preserve"
+          style="font-size:46.6667px;font-family:'Heiti SC';-inkscape-font-specification:'Heiti SC, Normal';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:0;stroke:#7dffff;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+          x="273.84268"
+          y="563.03387"
+          id="text2"><tspan
+             id="tspan2"
+             x="273.84268"
+             y="563.03387"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:46.6667px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#7dffff;fill-opacity:1;stroke-width:0;stroke-dasharray:none">Play Game</tspan></text>
+   </g>
+</svg>
