@@ -6,6 +6,8 @@ from pyglet.text import Label
 
 from lxml import etree
 
+import units
+
 NS = {"svg": "http://www.w3.org/2000/svg"}
 STR_NS = "{http://www.w3.org/2000/svg}"
 
@@ -94,73 +96,19 @@ text_program = ShaderProgram(text_vertex_shader, text_fragment_shader)
 
 #helper function used in extracting data from 'transform' attributes in svg elements
 def get_transformation(elem, group_elem):
-    def extract_transformation(data):
-        return data[0], Vec2(data[1].split(","))
+    """Extract transformation data from an SVG element's 'transform' attribute Eg:
+    "translate(50,100)scale(1.5,2)"""
+    def extract_transformation(data: list[str]):
+        return data[0], Vec2(units.Value(number).in_pixels() for number in data[1].split(","))
     
     transform_attr = elem.get("transform") or group_elem.get("transform") or ""
     return [extract_transformation(transform.split("(")) for transform in transform_attr.split(")")[:-1]]
 
 def get_style(elem):
+    """Extract CSS data from an SVG element's 'style' attribute and return a dict containing the data. Eg:
+    
+    "fill:#000000;fill-opacity:0;stroke:#7dffff" -> {"fill":"#000000", "fill-opacity":"0", "stroke":"#7dffff"}"""
     return {string.split(":")[0]: string.split(":")[1] for string in elem.get("style").split(";")}
-
-class Value:
-
-    UNITS = {"px", "in"}
-    NUMERICAL_SET = {"0", "1", "2", "3", "4", "5", "6", "7", "9", "."}
-    NUMERICAL_DICT = {value: "" for value in NUMERICAL_SET}
-
-    def __init__(self, value: str):
-        self.str_data = value #the source data in a string format, eg: str("19.6653px")
-    
-    def get_data_and_unit(self) -> tuple[float, str]:
-
-        str_data = self.str_data
-        data_unit_stripped_: str = str_data
-        out_unit: str | None = None #initialize unit as None
-
-        for unit in self.UNITS: #loop through all the units supported by this SVG loader/parser/renderer
-
-            data_unit_stripped_ = data_unit_stripped_.replace(unit, "") #get the data with the current unit stripped
-
-            #if the unit used by the data is the same as the current unit in the loop
-            if not data_unit_stripped == str_data: 
-                out_unit = unit #set the return unit to the current unit in the loop
-        
-        #if it is using user units (out_unit has not changed having been through the above for loop and is still 
-        # None (what it was initialised as))
-        if out_unit == None:
-            out_unit = "px" #default to pixels
-        
-        return float(data_unit_stripped), out_unit
-
-    @property
-    def data(self):
-
-        global data_unit_stripped
-        data_unit_stripped = self.str_data
-
-        for unit in self.UNITS: #loop through all the units supported by this SVG loader/parser/renderer
-            data_unit_stripped = data_unit_stripped.replace(unit, "") #get the data with the current unit stripped
-        
-        return float(data_unit_stripped)
-    
-    @property
-    def unit(self):
-        trans_table = self.str_data.maketrans(self.NUMERICAL_DICT)
-        return self.str_data.translate(trans_table)
-
-
-    def in_pixels(self): #TODO
-        n_data, unit = self.get_data_and_unit()
-
-        match unit:
-            case "px":
-                return n_data
-            case "in":
-                return self.in_to_px(n_data)
-    
-    def in_to_px(self, inches: float | int):
-        return inches * 96
 
 def has_text(element):
     if element.text == "":
@@ -201,7 +149,7 @@ class SVGFile:
                         #     y=float(tspan_elem.get("y")),
                         #     multiline=False,
                         #     font_name=style["font-family"],
-                        #     font_size=Value(style["font-size"]).in_pixels(),
+                        #     font_size=units.convert(style["font-size"], "px"),
                         #     weight=style["font-weight"],
                         #     italic=style["font-style"] == "italic",
                         #     stretch=False,
@@ -223,7 +171,7 @@ def main():
     window = Window()
     svg = SVGFile("Assets/play-button.svg")
 
-    value = Value("19.6679in")
+    value = units.Value("19.6679in")
     print(f"{value.str_data=}\n")
     print(f"{value.data=}\n")
     print(f"{value.unit=}\n")
