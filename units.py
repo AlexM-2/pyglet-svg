@@ -1,126 +1,188 @@
-from typing import Self, overload
+from string import printable
 
-UNITS = {"px", "in"} #all the units supported by pyglet-svg
+UNITS = [
+    "px", "in", "cm", "mm", "pt", "pc", "q", #absolute units
+    "em", "ex", "ch", "rem", "lh", "%", "vw", "vh", "vmin", "vmax" #relative units
+]
 
 #the charcters that need to be removed from the source string data to leave only the unit
-NUMERICAL_SET = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."}
+NUMERICAL = "0123456789."
 #a dict that can be used in str.maketrans() to make a translation table that can be used in str.translate() to
 # remove all numerical characters from the source string data to leave only the unit
-NUMERICAL_DICT = {value: "" for value in NUMERICAL_SET}
+NUMERICAL_DICT = {value: "" for value in NUMERICAL}
+
+NON_NUMERICAL = printable.translate(printable.maketrans(NUMERICAL_DICT))
+NON_NUMERICAL_DICT = {value: "" for value in NON_NUMERICAL}
+
+PX_PER_IN = 96
+CM_PER_IN = 2.54
+MM_PER_IN = 25.4
+PT_PER_IN = 72
+PC_PER_IN = 6
+Q_PER_IN = 101.6
 
 class Value:
+    def __init__(self, data: float | int, unit: str):
 
-    @overload
-    def __init__(self, str_data: str): ...
-    @overload
-    def __init__(self, value: Self): ...
-    @overload
-    def __init__(self, data: float, unit: str): ...
-    def __init__(self, arg1, arg2 = None):
+        if not data == float() | int():
+            raise TypeError(f"Value() argument 'data' must be a float or integer, not {type(data)}")
+        if not unit == str():
+            raise TypeError(f"Value() argument 'unit' must be a str, not {type(unit)}")
+        if not unit in UNITS:
+            raise ValueError(f"Value() argument 'unit' must a valid unit supported by pylget-svg, not {unit}")
         
-        match (arg1, arg2):
-            case (str(), None):
-                self.str_data = arg1
-            case (Value(), None):
-                self.str_data = arg1.str_data
-            case (float(), str()):
-                self.str_data = str(arg1) + arg2
-            case (_, _):
-                raise TypeError("Invalid types for 'arg1' and/or 'arg2'")
-
+        self._data = data
+        self._unit = unit
+        self._str_data = str(data) + str(unit)
+        self._dirty = False
     
     def __str__(self):
         return self.str_data
     
-    def get_data_and_unit(self) -> tuple[str, str]:
-        return get_data_and_unit(self.str_data)
-    
-    def get_data_str(self):
-        return get_data_str(self.str_data)
-
     @property
-    def data(self):
-        return get_data(self.str_data)
+    def str_data(self):
+        if self._dirty == True:
+            self._str_data = str(self._data) + str(self._unit)
         
+        return self._str_data
     
-    @data.setter
-    def data(self, number: float | str):
-        self.str_data = str(number) + self.unit
-
     @property
     def unit(self):
-        return get_unit(self.str_data)
+        return self._unit
     
     @unit.setter
-    def unit(self, unit: str, modify_data: bool = True):
-        if modify_data == False:
-            self.str_data = self.get_data_str() + unit
-        else:
-            self.str_data = convert(self, unit).str_data
-
-def get_data_and_unit(str_data) -> tuple[str, str]:
-
-    data_unit_stripped: str = str_data
-    out_unit: str | None = None #initialize unit as None
-
-    for unit in UNITS: #loop through all the units supported by this SVG loader/parser/renderer
-
-        data_unit_stripped = data_unit_stripped.replace(unit, "") #get the data with the current unit stripped
-
-        #if the unit used by the data is the same as the current unit in the loop
-        if not data_unit_stripped == str_data: 
-            out_unit = unit #set the return unit to the current unit in the loop
+    def unit(self, unit: str):
+        if not unit == str():
+            raise TypeError(f"Value.unit must be a str, not {type(unit)}")
+        if not unit in UNITS:
+            raise ValueError(f"Value.unit must a valid unit supported by pylget-svg, not {unit}")
         
-    #if it is using user units (out_unit has not changed having been through the above for loop and is still 
-    # None (what it was initialised as))
-    if out_unit == None:
-        out_unit = "px" #default to pixels
+        self._dirty = True
+        self._unit = unit
+    
+    @property
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self, data: float | int):
+        if not data == float() | int():
+            raise TypeError(f"Value.data must be a float or integer, not {type(data)}")
         
-    return data_unit_stripped, out_unit
+        self._dirty = True
+        self._data = data
+    
+    def convert(self, unit: str):
+        self.unit = unit
 
-def get_data_str(str_data: str) -> str:
+        self._data = convert(self._data, self._unit, unit)
 
-    for unit in UNITS: #loop through all the units supported by this SVG loader/parser/renderer
-        str_data = str_data.replace(unit, "") #get the data with the current unit stripped
-        
-    return str_data
+def get_data(str_data: str):
+    return str_data.translate(str_data.maketrans(NON_NUMERICAL_DICT))
 
-def get_data(str_data: str) -> float:
-    return float(get_data_str(str_data))
+def get_unit(str_data: str):
+    return str_data.translate(str_data.maketrans(NUMERICAL_DICT))
 
-def get_unit(str_data: str) -> str:
-    trans_table = str_data.maketrans(NUMERICAL_DICT)
-    return str_data.translate(trans_table)
+def get_data_and_unit_str(str_data: str):
+    return get_data(str_data), get_unit(str_data)
 
-#defines conversion constants to convert between from every unit to all the other units
-CONVERSION_TABLE = {
-    "px": {"px":1,        "in":1/96,    "cm":1/(96/2.54), "mm":1/(96/72), "pt":1/(96/72), "pc":1/16,    "q":1/(96/101.6)},
-    "in": {"px":96,       "in":1,       "cm":2.54,        "mm":25.4,      "pt":72,        "pc":6,       "q":101.6       },
-    "cm": {"px":96/2.54,  "in":1/2.54,  "cm":1,           "mm":10,        "pt":72/2.54,   "pc":6/2.54,  "q":40          },
-    "mm": {"px":96/25.4,  "in":1/25.4,  "cm":1/10,        "mm":1,         "pt":72/25.4,   "pc":6/25.4,  "q":4           },
-    "pt": {"px":96/72,    "in":1/72,    "cm":2.54/72,     "mm":25.4/72,   "pt":1,         "pc":1/12,    "q":101.6/72    },
-    "pc": {"px":16,       "in":1/6,     "cm":2.54/6,      "mm":25.4/6,    "pt":12,        "pc":1,       "q":101.6/6     },
-    "q":  {"px":96/101.6, "in":1/101.6, "cm":1/40,        "mm":1/4,       "pt":72/101.6,  "pc":6/101.6, "q":1           },
-}
+def get_data_and_unit(str_data: str):
+    return float(get_data(str_data)), get_unit(str_data)
 
-@overload
-def convert(str_data: str, unit: str) -> Value: ...
-@overload
-def convert(data: Value, unit: str) -> Value: ...
-def convert(arg1: Value | str, unit: str) -> Value:
-    match (arg1, unit):
-        case (Value(), str()):
-            return Value(arg1.data * CONVERSION_TABLE[arg1.unit][unit], unit)
-        case (str(), str()):
-            return Value(arg1)
+def get_px(value: float, from_unit: str, **context) -> float:
+    fs = context.get("font_size", 16)
+    rfs = context.get("root_font_size", fs)
+    xh = context.get("x_height_ratio", 0.5)
+    zw = context.get("zero_width_ratio", 0.5)
+    lh = context.get("line_height", fs)
+    ref = context.get("reference_length", 100)
+    vw = context.get("viewport_width", 100)
+    vh = context.get("viewport_height", 100)
+    vmin = context.get("vmin", min(vw, vh))
+    vmax = context.get("vmax", max(vw, vh))
 
+    if from_unit == "px": return value
+    if from_unit == "in": return value * PX_PER_IN
+    if from_unit == "cm": return value * (PX_PER_IN / CM_PER_IN)
+    if from_unit == "mm": return value * (PX_PER_IN / MM_PER_IN)
+    if from_unit == "pt": return value * (PX_PER_IN / PT_PER_IN)
+    if from_unit == "pc": return value * (PX_PER_IN / (PT_PER_IN / 12))
+    if from_unit == "q": return value * (PX_PER_IN / Q_PER_IN)
+    if from_unit == "em": return value * fs
+    if from_unit == "ex": return value * fs * xh
+    if from_unit == "ch": return value * fs * zw
+    if from_unit == "rem": return value * rfs
+    if from_unit == "lh": return value * lh
+    if from_unit == "%": return (value / 100.0) * ref
+    if from_unit == "vw": return (value / 100.0) * vw
+    if from_unit == "vh": return (value / 100.0) * vh
+    if from_unit == "vmin": return (value / 100.0) * vmin
+    if from_unit == "vmax": return (value / 100.0) * vmax
 
+    raise ValueError(f"Unsupported unit: {from_unit}")
+
+def from_px(px: float, to_unit: str, **context) -> float:
+    fs = context.get("font_size", 16)
+    rfs = context.get("root_font_size", fs)
+    xh = context.get("x_height_ratio", 0.5)
+    zw = context.get("zero_width_ratio", 0.5)
+    lh = context.get("line_height", fs)
+    ref = context.get("reference_length", 100)
+    vw = context.get("viewport_width", 100)
+    vh = context.get("viewport_height", 100)
+    vmin = context.get("vmin", min(vw, vh))
+    vmax = context.get("vmax", max(vw, vh))
+
+    if to_unit == "px": return px
+    if to_unit == "in": return px / PX_PER_IN
+    if to_unit == "cm": return px / (PX_PER_IN / CM_PER_IN)
+    if to_unit == "mm": return px / (PX_PER_IN / MM_PER_IN)
+    if to_unit == "pt": return px / (PX_PER_IN / PT_PER_IN)
+    if to_unit == "pc": return px / 16  # (12 pt/in × 72 pt = 96 px)
+    if to_unit == "q": return px / (PX_PER_IN / Q_PER_IN)
+    if to_unit == "em": return px / fs
+    if to_unit == "ex": return px / (fs * xh)
+    if to_unit == "ch": return px / (fs * zw)
+    if to_unit == "rem": return px / rfs
+    if to_unit == "lh": return px / lh
+    if to_unit == "%": return (px / ref) * 100
+    if to_unit == "vw": return (px / vw) * 100
+    if to_unit == "vh": return (px / vh) * 100
+    if to_unit == "vmin": return (px / vmin) * 100
+    if to_unit == "vmax": return (px / vmax) * 100
+
+    raise ValueError(f"Unsupported unit: {to_unit}")
+
+def convert(data: float | int, from_unit: str, to_unit: str, **context):
+    if not data == float() | int():
+        raise TypeError(f"convert() argument 'data' must be a float or int, not {type(data)}")
+    if not from_unit == str():
+        raise TypeError(f"convert() argument 'from_unit' must a str, not {type(from_unit)}")
+    if not from_unit in UNITS:
+        raise ValueError(f"convert() argument 'from_unit' must be a valid unit supported by pyglet-svg, not {from_unit}'")
+    if not to_unit == str():
+        raise TypeError(f"convert() argument 'to_unit' must a str, not {type(to_unit)}")
+    if not to_unit in UNITS:
+        raise ValueError(f"convert() argument 'to_unit' must be a valid unit supported by pyglet-svg, not {to_unit}'")
+
+    return from_px(get_px(data, from_unit, to_unit, **context), to_unit, **context)
+
+def convert_str(str_data: str, to_unit: str, **context) -> float:
+    """Convert data in the format '<data><unit>' to another unit"""
+    data = get_data(str_data)
+    unit = get_unit(str_data)
+
+    if not data == float() | int():
+        raise TypeError(f"convert_str() argument 'data' must be a float or int, not {type(data)}")
+    if not to_unit == str():
+        raise TypeError(f"convert_str() argument 'to_unit' must a str, not {type(to_unit)}")
+    if not to_unit in UNITS:
+        raise ValueError(f"convert_str() argument 'to_unit' must be a valid unit supported by pyglet-svg, not {to_unit}'")
+    
+    return convert(data, unit, to_unit, **context)
 
 def main() -> None:
-    value = Value("200.234px")
-    print(value)
-    value.unit = "in"
-    print(value.data, value.unit)
+    pass
 
 if __name__ == "__main__":
     main()
