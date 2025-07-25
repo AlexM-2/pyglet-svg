@@ -22,7 +22,7 @@ PC_PER_IN = 6
 Q_PER_IN = 101.6
 
 class Value:
-    def __init__(self, data: float | int, unit: str):
+    def __init__(self, data: float | int, unit: str, **context):
 
         if not data == float() | int():
             raise TypeError(f"Value() argument 'data' must be a float or integer, not {type(data)}")
@@ -35,6 +35,8 @@ class Value:
         self._unit = unit
         self._str_data = str(data) + str(unit)
         self._dirty = False
+
+        self.context = context
     
     def __str__(self):
         return self.str_data
@@ -72,10 +74,10 @@ class Value:
         self._dirty = True
         self._data = data
     
-    def convert(self, unit: str):
+    def convert(self, unit: str, **context):
         self.unit = unit
 
-        self._data = convert(self._data, self._unit, unit)
+        self._data = convert(self._data, self._unit, unit, **(context or self.context))
 
 def get_data(str_data: str):
     return str_data.translate(str_data.maketrans(NON_NUMERICAL_DICT))
