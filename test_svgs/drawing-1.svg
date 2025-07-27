@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+    width="105.83334mm"
+    height="105.83334mm"
+    viewBox="0 0 105.83334 105.83334"
+    version="1.1"
+    id="svg1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:svg="http://www.w3.org/2000/svg">
+   <defs
+       id="defs1" />
+   <g
+       id="layer1">
+      <path
+          style="fill:#564aff;fill-opacity:1;stroke:#f80c10;stroke-width:0.563509;stroke-dasharray:none;stroke-opacity:1"
+          d="m 55.523488,16.258973 c 13.686333,-9.1205466 26.476561,3.947368 20.564242,6.584023 19.156914,-1.859248 17.593119,12.264159 11.789715,14.271034 9.527679,11.32961 5.124113,20.489153 1.228094,22.144707 9.980457,11.425748 2.342809,24.174838 -9.333522,21.652608 -0.814044,14.78366 -17.603508,20.315215 -23.579431,4.42894 C 48.968797,107.11382 27.356118,100.65194 28.68325,81.403445 35.841357,74.087485 0.80529395,68.140343 16.156677,63.687682 -3.5749067,62.714296 16.318087,48.008997 10.507438,42.773231 2.2824107,39.317365 14.485157,39.845171 8.7881041,29.486408 18.01925,30.111977 25.98274,28.965604 24.753344,14.969322 20.466563,0.47379139 46.228961,3.8355474 55.523488,16.258973 Z"
+          id="path2" />
+      <path
+          style="fill:#fee134;fill-opacity:1;stroke:#ff0684;stroke-width:1.12701;stroke-dasharray:none;stroke-opacity:1"
+          d="m 39.918771,39.309546 -4.598589,-16.532572 13.467295,10.280621 22.007533,-7.2391 -3.941646,17.768702 16.42353,6.581 -21.350589,7.8972 L 72.108893,70.569298 50.772582,63.001147 35.977123,74.846945 39.918771,59.710647 21.852886,57.078246 28.093827,49.839148 13.312648,33.057595 Z"
+          id="path1" />
+      <text
+          xml:space="preserve"
+          style="font-size:15.0269px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#564aff;fill-opacity:1;stroke:#f80c10;stroke-width:0.563509;stroke-dasharray:none;stroke-opacity:1"
+          x="30.067343"
+          y="54.231625"
+          id="text1"
+          transform="scale(0.99911925,1.0008815)">
+          <tspan
+             id="tspan1"
+             style="font-size:15.0269px;fill:#564aff;fill-opacity:1;stroke:#f80c10;stroke-width:0.563509;stroke-dasharray:none;stroke-opacity:1"
+             x="30.067343"
+             y="54.231625">POW</tspan></text>
+   </g>
+</svg>
