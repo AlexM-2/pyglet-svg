@@ -3,10 +3,13 @@ from pyglet.graphics import Batch
 from pyglet.graphics.shader import Shader, ShaderProgram
 from pyglet.math import Vec2
 from pyglet.text import Label
+from pyglet.app import run
 
 from lxml import etree
 
 import units
+
+__all__ = ["units"]
 
 NS = {"svg": "http://www.w3.org/2000/svg"}
 STR_NS = "{http://www.w3.org/2000/svg}"
@@ -90,10 +93,6 @@ fragment_source = """#version 330 core
     }
 """
 
-text_vertex_shader = Shader(vertex_source, "vertex")
-text_fragment_shader = Shader(fragment_source, "fragment")
-text_program = ShaderProgram(text_vertex_shader, text_fragment_shader)
-
 #helper function used in extracting data from 'transform' attributes in svg elements
 def get_transformation(elem, group_elem):
     """Extract transformation data from an SVG element's 'transform' attribute Eg:
@@ -118,6 +117,11 @@ def has_text(element):
 
 class SVGFile:
     def __init__(self, file_path_or_tree: str | etree._ElementTree):
+
+        text_vertex_shader = Shader(vertex_source, "vertex")
+        text_fragment_shader = Shader(fragment_source, "fragment")
+        text_program = ShaderProgram(text_vertex_shader, text_fragment_shader)
+
         if type(file_path_or_tree) == str:
             self.tree: etree._ElementTree = etree.parse(file_path_or_tree)
         elif type(file_path_or_tree) == etree._ElementTree:
@@ -143,20 +147,20 @@ class SVGFile:
                     for tspan_elem in tspan_elems:
                         
                         style = get_style(tspan_elem)
-                        # tspans.append(Label(
-                        #     text=tspan_elem.text,
-                        #     x=float(tspan_elem.get("x")),
-                        #     y=float(tspan_elem.get("y")),
-                        #     multiline=False,
-                        #     font_name=style["font-family"],
-                        #     font_size=units.convert(style["font-size"], "px"),
-                        #     weight=style["font-weight"],
-                        #     italic=style["font-style"] == "italic",
-                        #     stretch=False,
-                        #     color=style["fill"],
-                        #     batch=self.batch,
-                        #     program=text_program
-                        # ))
+                        tspans.append(Label(
+                            text=tspan_elem.text,
+                            x=float(tspan_elem.get("x")),
+                            y=float(tspan_elem.get("y")),
+                            multiline=False,
+                            font_name=style["font-family"],
+                            font_size=units.convert(style["font-size"], "px"),
+                            weight=style["font-weight"],
+                            italic=style["font-style"] == "italic",
+                            stretch=False,
+                            color=style["fill"],
+                            batch=self.batch,
+                            program=text_program
+                        ))
                 
                 out_group.append(elem)
         
@@ -176,6 +180,8 @@ def main():
     print(f"{value.data=}\n")
     print(f"{value.unit=}\n")
     print(f"{value.in_pixels()=}\n")
+
+    # run()
 
 if __name__ == "__main__":
     main()
