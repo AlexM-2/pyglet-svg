@@ -64,7 +64,7 @@ class SVGFile:
         self.batch.draw()
 
 def main():
-    svg = SVGFile("Assets/play-button.svg")
+    svg = SVGFile("test_svgs/drawing-1.svg")
 
 if __name__ == "__main__":
     main()
