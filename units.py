@@ -22,11 +22,11 @@ PC_PER_IN = 6
 Q_PER_IN = 101.6
 
 class Value:
-    def __init__(self, data: float | int, unit: str, **context):
+    def __init__(self, data: float, unit: str, **context):
 
-        if not data == float() | int():
-            raise TypeError(f"Value() argument 'data' must be a float or integer, not {type(data)}")
-        if not unit == str():
+        if not data.__class__ == float:
+            raise TypeError(f"Value() argument 'data' must be a float, not {type(data)}")
+        if not unit.__class__ == str:
             raise TypeError(f"Value() argument 'unit' must be a str, not {type(unit)}")
         if not unit in UNITS:
             raise ValueError(f"Value() argument 'unit' must a valid unit supported by pylget-svg, not {unit}")
@@ -54,7 +54,7 @@ class Value:
     
     @unit.setter
     def unit(self, unit: str):
-        if not unit == str():
+        if not unit.__class__ == str:
             raise TypeError(f"Value.unit must be a str, not {type(unit)}")
         if not unit in UNITS:
             raise ValueError(f"Value.unit must a valid unit supported by pylget-svg, not {unit}")
@@ -67,17 +67,24 @@ class Value:
         return self._data
     
     @data.setter
-    def data(self, data: float | int):
-        if not data == float() | int():
-            raise TypeError(f"Value.data must be a float or integer, not {type(data)}")
+    def data(self, data: float):
+        if not data.__class__ == float:
+            raise TypeError(f"Value.data must be a float, not {type(data)}")
         
         self._dirty = True
         self._data = data
     
     def convert(self, unit: str, **context):
-        self.unit = unit
+
+        if not unit.__class__ == str:
+            raise TypeError(f"Value.convert() argument 'unit' must be a str, not {type(unit)}")
+        if not unit in UNITS:
+            raise ValueError(f"Value.unit must a valid unit supported by pylget-svg, not {unit}")
 
         self._data = convert(self._data, self._unit, unit, **(context or self.context))
+
+        self._unit = unit
+        self._dirty = True
 
 def get_data(str_data: str):
     return str_data.translate(str_data.maketrans(NON_NUMERICAL_DICT))
@@ -155,28 +162,28 @@ def from_px(px: float, to_unit: str, **context) -> float:
 
     raise ValueError(f"Unsupported unit: {to_unit}")
 
-def convert(data: float | int, from_unit: str, to_unit: str, **context):
-    if not data == float() | int():
-        raise TypeError(f"convert() argument 'data' must be a float or int, not {type(data)}")
-    if not from_unit == str():
+def convert(data: float, from_unit: str, to_unit: str, **context):
+    if not data.__class__ == float:
+        raise TypeError(f"convert() argument 'data' must be a float, not {type(data)}")
+    if not from_unit.__class__ == str:
         raise TypeError(f"convert() argument 'from_unit' must a str, not {type(from_unit)}")
     if not from_unit in UNITS:
         raise ValueError(f"convert() argument 'from_unit' must be a valid unit supported by pyglet-svg, not {from_unit}'")
-    if not to_unit == str():
+    if not to_unit.__class__ == str:
         raise TypeError(f"convert() argument 'to_unit' must a str, not {type(to_unit)}")
     if not to_unit in UNITS:
         raise ValueError(f"convert() argument 'to_unit' must be a valid unit supported by pyglet-svg, not {to_unit}'")
 
-    return from_px(get_px(data, from_unit, to_unit, **context), to_unit, **context)
+    return from_px(get_px(data, from_unit, **context), to_unit, **context)
 
 def convert_str(str_data: str, to_unit: str, **context) -> float:
     """Convert data in the format '<data><unit>' to another unit"""
     data = get_data(str_data)
     unit = get_unit(str_data)
 
-    if not data == float() | int():
-        raise TypeError(f"convert_str() argument 'data' must be a float or int, not {type(data)}")
-    if not to_unit == str():
+    if not data.__class__ == float:
+        raise TypeError(f"convert_str() argument 'data' must be a float, not {type(data)}")
+    if not to_unit.__class__ == str:
         raise TypeError(f"convert_str() argument 'to_unit' must a str, not {type(to_unit)}")
     if not to_unit in UNITS:
         raise ValueError(f"convert_str() argument 'to_unit' must be a valid unit supported by pyglet-svg, not {to_unit}'")
@@ -184,7 +191,11 @@ def convert_str(str_data: str, to_unit: str, **context) -> float:
     return convert(data, unit, to_unit, **context)
 
 def main() -> None:
-    pass
+    print(from_px(get_px(23.8673, "cm"), "in"))
+    print(convert(23.8673, "cm", "in"))
+    value = Value(23.8673, "cm")
+    value.convert("in")
+    print(value)
 
 if __name__ == "__main__":
     main()
