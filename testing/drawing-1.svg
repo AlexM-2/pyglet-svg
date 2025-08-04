@@ -23,15 +23,16 @@
           id="path1" />
       <text
           xml:space="preserve"
-          style="font-size:15.0269px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#564aff;fill-opacity:1;stroke:#f80c10;stroke-width:0.563509;stroke-dasharray:none;stroke-opacity:1"
+          style="font-size:15.0269px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#f80c10;stroke-width:0.21166667;stroke-dasharray:none;stroke-opacity:1"
           x="30.067343"
           y="54.231625"
           id="text1"
-          transform="scale(0.99911925,1.0008815)">
-          <tspan
+          transform="scale(0.99911925,1.0008815)"><tspan
              id="tspan1"
-             style="font-size:15.0269px;fill:#564aff;fill-opacity:1;stroke:#f80c10;stroke-width:0.563509;stroke-dasharray:none;stroke-opacity:1"
+             style="font-size:15.0269px;fill:#564aff;fill-opacity:1;stroke:#f80c10;stroke-width:0.5;stroke-dasharray:none;stroke-opacity:1"
              x="30.067343"
-             y="54.231625">POW</tspan></text>
+             y="54.231625">P<tspan
+    style="font-size:5.64444px;stroke-width:0.21166667;stroke-dasharray:none"
+    id="tspan3">OW</tspan></tspan></text>
    </g>
 </svg>

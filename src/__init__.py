@@ -1,7 +1,8 @@
-from pyglet.window import Window
 from pyglet.graphics import Batch
 from pyglet.graphics.shader import Shader, ShaderProgram
 from pyglet.math import Vec2
+from pyglet.text.document import UnformattedDocument
+from pyglet.text.layout.base import TextLayout
 
 from xml.etree import ElementTree as ET
 
@@ -57,7 +58,9 @@ class SVGFile:
                 if elem.tag == STR_NS+"g":
                     loop(elem)
                 elif elem.tag == STR_NS+"text":
-                    style = get_style(elem)
+                    doc = UnformattedDocument(elem.text)
+                    doc.set_style(0, 1, {""})
+
         loop(root)
 
     def draw(self):
